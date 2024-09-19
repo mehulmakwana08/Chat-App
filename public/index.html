@@ -1,0 +1,236 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #chat-container {
+            background-color: #fff;
+            width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        #heading {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        #user-list {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        #messages {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        #messages li {
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #message {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        #send {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        #send:hover {
+            background-color: #45a049;
+        }
+
+        #send:active {
+            transform: scale(0.95);
+        }
+
+        #namePrompt {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #nameInput {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        #nameSubmit {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="namePrompt">
+        <h2>Enter your name:</h2>
+        <input type="text" id="nameInput" placeholder="Your name">
+        <button id="nameSubmit">Join Chat</button>
+    </div>
+
+    <div id="chat-container" style="display:none;">
+        <!-- Added heading for the chat application -->
+        <h1 id="heading">Welcome to the Chat Application</h1>
+        
+        <div id="user-list">
+            <h4>Connected Users: <span id="user-count">0</span></h4>
+            <ul id="user-names"></ul>
+        </div>
+
+        <ul id="messages"></ul> <!-- Container for displaying chat messages -->
+
+        <div id="input-container">
+            <input type="text" autocomplete="off" id="message" placeholder="Enter your message">
+            <button id="send">Send</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const messageInput = document.getElementById('message');
+        const messages = document.getElementById('messages');
+        const sendButton = document.getElementById('send');
+        const chatContainer = document.getElementById('chat-container');
+        const namePrompt = document.getElementById('namePrompt');
+        const nameInput = document.getElementById('nameInput');
+        const nameSubmit = document.getElementById('nameSubmit');
+        const userCount = document.getElementById('user-count');
+        const userNames = document.getElementById('user-names');
+
+        let userName = '';
+
+        // Prompt for the user's name before joining the chat
+       // Event listener for the 'Join Chat' button click
+       nameSubmit.addEventListener('click', () => {
+        startChat();
+         });
+
+       // Event listener for pressing Enter in the name input field
+       nameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            startChat();
+        }
+        });
+
+// Function to start the chat
+function startChat() {
+    userName = nameInput.value.trim();
+    if (userName !== '') {
+        socket.emit('set username', userName); // Send the name to the server
+        namePrompt.style.display = 'none'; // Hide the name input prompt
+        chatContainer.style.display = 'flex'; // Show the chat container
+    } else {
+        alert("Please enter a name");
+    }
+}
+
+
+        // Send message on Enter key press or send button click
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        sendButton.addEventListener('click', function() {
+            sendMessage();
+        });
+
+        function sendMessage() {
+            if (messageInput.value.trim() !== '') {
+                socket.emit('chat message', messageInput.value);
+                messageInput.value = ''; // Clear input after sending
+            }
+        }
+
+        // Receive and display new messages
+        socket.on('chat message', (msg) => {
+            const item = document.createElement('li');
+            item.textContent = msg;
+            messages.appendChild(item);
+            messages.scrollTop = messages.scrollHeight;
+        });
+
+        // Update the list of connected users and their count
+        socket.on('user list', (data) => {
+            userCount.textContent = data.count;
+            userNames.innerHTML = '';
+            data.users.forEach((user) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = user;
+                userNames.appendChild(listItem);
+            });
+        });
+    </script>
+</body>
+</html>
