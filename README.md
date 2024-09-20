@@ -3,10 +3,10 @@
 
 This project is a real-time chat application built with Node.js, Express, and Socket.io. The application allows users to connect, set their usernames, and engage in live chat with others. It features a user-friendly interface where connected users can see each other in a list and exchange messages instantly.
 
-# Key Features:
+# Key Features :
 Real-time Communication: Leveraging Socket.io for instant messaging between users.
 
-# User Management:
+# User Management :
  Users can set their unique usernames upon joining the chat, with a dynamically updated user list.
 
 # Responsive Design:
