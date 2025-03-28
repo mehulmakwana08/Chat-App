@@ -1,4 +1,3 @@
-
 # Chat Application
 
 This project is a real-time chat application built with Node.js, Express, and Socket.io. The application allows users to connect, set their usernames, and engage in live chat with others. It features a user-friendly interface where connected users can see each other in a list and exchange messages instantly.
@@ -48,6 +47,14 @@ npm start
 
 # Contributing
 Contributions are welcome! If you have suggestions for improvements or new features, feel free to open an issue or submit a pull request.
+
+# New Feature Suggestions
+1. **File Sharing**: Allow users to share files within the chat.
+2. **Emoji Support**: Enable users to send and receive emojis in their messages.
+3. **Private Messaging**: Add functionality for users to send private messages to each other.
+4. **Message Reactions**: Allow users to react to messages with emojis.
+5. **Typing Indicators**: Show indicators when a user is typing a message.
+
 ## Demo
 
 Insert gif or link to demo
