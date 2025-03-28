@@ -1,7 +1,8 @@
-// server.js
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const fs = require('fs');
+const path = require('path');
 
 // Initialize the Express app and HTTP server
 const app = express();
@@ -31,6 +32,49 @@ io.on('connection', (socket) => {
         if (userName) {
             io.emit('chat message', `${userName}: ${msg}`); // Prefix message with user's name
         }
+    });
+
+    // Handle file sharing
+    socket.on('file upload', (fileData) => {
+        const fileName = fileData.name;
+        const fileBuffer = Buffer.from(fileData.data, 'base64');
+        const filePath = path.join(__dirname, 'public', 'uploads', fileName);
+
+        fs.writeFile(filePath, fileBuffer, (err) => {
+            if (err) {
+                console.error('Error saving file:', err);
+                socket.emit('file upload error', 'Failed to upload file.');
+            } else {
+                io.emit('file upload', { name: fileName, url: `/uploads/${fileName}` });
+            }
+        });
+    });
+
+    // Handle emoji support
+    socket.on('emoji message', (emoji) => {
+        if (userName) {
+            io.emit('emoji message', { user: userName, emoji });
+        }
+    });
+
+    // Handle private messaging
+    socket.on('private message', ({ recipient, message }) => {
+        const recipientSocket = [...io.sockets.sockets.values()].find(s => s.userName === recipient);
+        if (recipientSocket) {
+            recipientSocket.emit('private message', { sender: userName, message });
+        } else {
+            socket.emit('private message error', 'Recipient not found.');
+        }
+    });
+
+    // Handle message reactions
+    socket.on('message reaction', ({ messageId, reaction }) => {
+        io.emit('message reaction', { user: userName, messageId, reaction });
+    });
+
+    // Handle typing indicators
+    socket.on('typing', (isTyping) => {
+        io.emit('typing', { user: userName, isTyping });
     });
 
     // Handle user disconnecting
