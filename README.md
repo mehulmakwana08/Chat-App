@@ -14,6 +14,14 @@ Real-time Communication: Leveraging Socket.io for instant messaging between user
  Chat messages smoothly fade in, enhancing the user experience.
 # User Notifications:
  Users receive notifications when others join or leave the chat.
+# File Sharing:
+ Users can share files within the chat.
+# Emoji Support:
+ Users can send and receive emojis in their messages.
+# Private Messaging:
+ Users can send private messages to each other.
+# Typing Indicators:
+ Show indicators when a user is typing a message.
 
 # Technologies Used
 
@@ -49,11 +57,7 @@ npm start
 Contributions are welcome! If you have suggestions for improvements or new features, feel free to open an issue or submit a pull request.
 
 # New Feature Suggestions
-1. **File Sharing**: Allow users to share files within the chat.
-2. **Emoji Support**: Enable users to send and receive emojis in their messages.
-3. **Private Messaging**: Add functionality for users to send private messages to each other.
-4. **Message Reactions**: Allow users to react to messages with emojis.
-5. **Typing Indicators**: Show indicators when a user is typing a message.
+1. **Message Reactions**: Allow users to react to messages with emojis.
 
 ## Demo
 
